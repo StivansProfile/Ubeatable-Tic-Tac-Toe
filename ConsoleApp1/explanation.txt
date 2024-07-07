@@ -1,0 +1,79 @@
+# Step 1: Define the Game Board
+board = [
+    [' ', ' ', ' '],
+    [' ', ' ', ' '],
+    [' ', ' ', ' ']
+]
+
+# Step 2: Define Helper Functions
+function checkWinner(board):
+    for i from 0 to 2:
+        if board[i][0] == board[i][1] == board[i][2] != ' ':
+            return board[i][0]  # Return the winner ('X' or 'O')
+        if board[0][i] == board[1][i] == board[2][i] != ' ':
+            return board[0][i]  # Return the winner ('X' or 'O')
+    if board[0][0] == board[1][1] == board[2][2] != ' ':
+        return board[0][0]  # Return the winner ('X' or 'O')
+    if board[0][2] == board[1][1] == board[2][0] != ' ':
+        return board[0][2]  # Return the winner ('X' or 'O')
+    return null  # No winner yet
+
+function getPossibleMoves(board):
+    moves = []
+    for i from 0 to 2:
+        for j from 0 to 2:
+            if board[i][j] == ' ':
+                moves.append((i, j))  # Collect all empty positions
+    return moves
+
+function makeMove(board, move, player):
+    (i, j) = move
+    board[i][j] = player
+
+function undoMove(board, move):
+    (i, j) = move
+    board[i][j] = ' '
+
+# Step 3: Define the Evaluation Function
+function evaluate(board):
+    if checkWinner(board) == 'X':  # X wins
+        return +1
+    if checkWinner(board) == 'O':  # O wins
+        return -1
+    return 0  # Draw or ongoing game
+
+# Step 4: Implement the Minimax Function
+function minimax(board, depth, isMaximizingPlayer):
+    if checkWinner(board) or depth == 0:  # Base case: check for terminal state or depth limit
+        return evaluate(board)            # terminal state we check if we returned 2,1 or 0
+
+    if isMaximizingPlayer:  # Maximizer's turn (X)
+        maxEval = -∞
+        for each move in getPossibleMoves(board):
+            makeMove(board, move, 'X')  # Simulate the move
+            eval = minimax(board, depth - 1, false)  # Recursive call
+            undoMove(board, move)  # Undo the move
+            maxEval = max(maxEval, eval)  # Take the maximum value
+        return maxEval
+    else:  # Minimizer's turn (O)
+        minEval = +∞
+        for each move in getPossibleMoves(board):
+            makeMove(board, move, 'O')  # Simulate the move
+            eval = minimax(board, depth - 1, true)  # Recursive call
+            undoMove(board, move)  # Undo the move
+            minEval = min(minEval, eval)  # Take the minimum value
+        return minEval
+
+# Step 5: Find the Best Move
+function findBestMove(board):
+    bestMove = null
+    bestValue = -∞  # Initialize to negative infinity for maximizer
+    depth = countEmptyCells(board)  # Or set to a predefined limit
+    for each move in getPossibleMoves(board):
+        makeMove(board, move, 'X')  # Simulate the move
+        moveValue = minimax(board, depth - 1, false)  # Evaluate move
+        undoMove(board, move)  # Undo the move
+        if moveValue > bestValue:  # Check if this move is better
+            bestValue = moveValue
+            bestMove = move
+    return bestMove
