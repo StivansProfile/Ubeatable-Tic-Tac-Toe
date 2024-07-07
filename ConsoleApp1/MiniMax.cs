@@ -106,7 +106,7 @@
         // Actual minimax recursive function
         // Depth is how many empty spaces or possibilities it checks
         // Returns a score for the best move - ranks the best move
-        public int Minimax(int depth, bool isAiTurn)
+        public int Minimax(int depth, bool isAiTurn, int itIsAi)
         {
             // Check for terminal state
             if (CheckForWinner() != null || depth == 0)
@@ -115,13 +115,13 @@
             }
 
             // If it's the AI's turn, we try to maximize
-            if (isAiTurn)
+            if (itIsAi == 2)
             {
                 int maxEval = int.MinValue;
                 foreach (var move in AllPossibleMoves())
                 {
                     MakeMove(move, 2);  // AI's move
-                    int eval = Minimax(depth - 1, false);
+                    int eval = Minimax(depth - 1, false ,2);
                     UndoMove(move);
                     maxEval = Math.Max(maxEval, eval);
                 }
@@ -134,7 +134,7 @@
                 foreach (var move in AllPossibleMoves())
                 {
                     MakeMove(move, 1);  // Human's move
-                    int eval = Minimax(depth - 1, true);
+                    int eval = Minimax(depth - 1, true, 1);
                     UndoMove(move);
                     minEval = Math.Min(minEval, eval);
                 }
@@ -147,12 +147,13 @@
         {
             int bestValue = int.MinValue;
             (int, int) bestMove = (0, 0);
+            // look for all empty spaces
             int depth = AllPossibleMoves().Count;
 
             foreach (var move in AllPossibleMoves())
             {
                 MakeMove(move, 2);  // Simulate the AI move (2 represents AI)
-                int moveValue = Minimax(depth - 1, false);  // Evaluate move using Minimax
+                int moveValue = Minimax(depth - 1, false, 2);  // Evaluate move using Minimax
                 UndoMove(move);  // Undo the move
 
                 if (moveValue > bestValue)  // Check if this move is better than the best so far
